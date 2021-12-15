@@ -1,19 +1,27 @@
 {
   "name": "ocr-expense-report",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "NODE_OPTIONS=--max_old_space_size=4096 next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint '**/*.{js,jsx,ts,tsx}'"
   },
   "dependencies": {
+    "@pankod/refine": "^2.0.7",
+    "@pankod/refine-nextjs-router": "^2.3.1",
     "next": "12.0.7",
-    "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "next-compose-plugins": "^2.2.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "@pankod/refine-airtable": "^2.0.7"
   },
   "devDependencies": {
-    "eslint": "8.4.1",
-    "eslint-config-next": "12.0.7"
+    "@types/node": "^14.14.13",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@typescript-eslint/parser": "^4.9.1",
+    "typescript": "^4.1.3"
   }
 }
