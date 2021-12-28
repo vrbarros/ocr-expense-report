@@ -8,6 +8,8 @@ import {
   EditButton,
   ShowButton,
   DeleteButton,
+  ImageField,
+  TagField,
 } from '@pankod/refine';
 
 import { IReceipt } from '@interfaces';
@@ -25,8 +27,27 @@ export const ReceiptList: React.FC<
     <List title="Receipts">
       <Table {...tableProps} rowKey="id">
         <Table.Column dataIndex="name" title="Name" />
-        <Table.Column dataIndex="notes" title="Notes" />
-        <Table.Column dataIndex="status" title="Status" />
+        <Table.Column
+          dataIndex="status"
+          title="Status"
+          render={(value) => <TagField value={value} />}
+        />
+        <Table.Column<IReceipt>
+          title="Attachments"
+          dataIndex="attachments"
+          render={(_, record) => (
+            <Space>
+              {record?.attachments?.map((file) => (
+                <ImageField
+                  key={file?.id}
+                  value={file.url}
+                  title={file.filename}
+                  width={150}
+                />
+              ))}
+            </Space>
+          )}
+        />
         <Table.Column<IReceipt>
           title="Actions"
           dataIndex="actions"

@@ -7,13 +7,18 @@ import {
   Upload,
   getValueFromEvent,
   useFileUploadState,
+  FormProps,
 } from '@pankod/refine';
 import { IReceipt } from '@interfaces';
 import axios from 'axios';
 
 export const ReceiptCreate: React.FC = () => {
-  const { formProps, saveButtonProps } = useForm<IReceipt>();
+  const { formProps, saveButtonProps } = useForm<IReceipt>({
+    redirect: 'show',
+  });
   const { isLoading, onChange } = useFileUploadState();
+
+  const { form }: FormProps = formProps;
 
   const uploadProps = {
     customRequest({
@@ -58,12 +63,15 @@ export const ReceiptCreate: React.FC = () => {
             .put(signedRequest, file, options)
             .then(({ data: result }) => {
               onSuccess(result, file);
+
+              const values = form?.getFieldsValue();
+              form?.setFieldsValue({ ...values, attachments: [{ url }] });
             })
             .catch(onError);
 
           return {
             abort() {
-              console.log('upload progress is aborted.');
+              console.log('Upload progress is aborted!');
             },
           };
         });
@@ -118,7 +126,7 @@ export const ReceiptCreate: React.FC = () => {
             },
           ]}
           name="attachments"
-          valuePropName="attachments"
+          valuePropName="fileList"
           getValueFromEvent={getValueFromEvent}
         >
           <Upload.Dragger
