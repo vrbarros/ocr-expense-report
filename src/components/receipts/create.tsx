@@ -8,17 +8,41 @@ import {
   getValueFromEvent,
   useFileUploadState,
   FormProps,
+  Progress,
+  Typography,
 } from '@pankod/refine';
 import { IReceipt } from '@interfaces';
 import axios from 'axios';
+import { useState } from 'react';
+import Tesseract from 'tesseract.js';
 
 export const ReceiptCreate: React.FC = () => {
   const { formProps, saveButtonProps } = useForm<IReceipt>({
     redirect: 'show',
   });
   const { isLoading, onChange } = useFileUploadState();
+  const [isExtracting, setExtracting] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [ocr, setOCR] = useState<any>(null);
 
   const { form }: FormProps = formProps;
+
+  const ocrExtractor = (imageUrl: string) => {
+    Tesseract.recognize(imageUrl, 'por+eng', {
+      logger: (m) => {
+        if (m.status === 'recognizing text') {
+          setProgress(Math.round(m?.progress * 100));
+        }
+      },
+    })
+      .catch((err) => {
+        console.error(err);
+      })
+      .then((result: any) => {
+        console.log(result);
+        setOCR(result);
+      });
+  };
 
   const uploadProps = {
     customRequest({
@@ -39,7 +63,8 @@ export const ReceiptCreate: React.FC = () => {
           fileType: file.type,
         })
         .then((res) => {
-          const { signedRequest, url } = res.data;
+          const { signedRequest, url }: { signedRequest: string; url: string } =
+            res.data;
 
           const options = {
             headers: {
@@ -66,6 +91,14 @@ export const ReceiptCreate: React.FC = () => {
 
               const values = form?.getFieldsValue();
               form?.setFieldsValue({ ...values, attachments: [{ url }] });
+
+              const image = URL.createObjectURL(file);
+
+              setExtracting(true);
+              setProgress(0);
+              setOCR(null);
+
+              ocrExtractor(image);
             })
             .catch(onError);
 
@@ -82,7 +115,7 @@ export const ReceiptCreate: React.FC = () => {
     <Create
       saveButtonProps={{
         ...saveButtonProps,
-        disabled: isLoading,
+        disabled: isLoading || !ocr,
       }}
     >
       <Form {...formProps} layout="vertical">
@@ -142,6 +175,14 @@ export const ReceiptCreate: React.FC = () => {
             </p>
           </Upload.Dragger>
         </Form.Item>
+        {isExtracting && (
+          <Form.Item label="Items">
+            {!ocr && <Progress type="circle" percent={progress} />}
+            {ocr?.data?.lines?.map((item: any) => (
+              <Typography>{item.text}</Typography>
+            ))}
+          </Form.Item>
+        )}
       </Form>
     </Create>
   );
