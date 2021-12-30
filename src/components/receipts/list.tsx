@@ -10,6 +10,7 @@ import {
   DeleteButton,
   ImageField,
   TagField,
+  InputNumber,
 } from '@pankod/refine';
 
 import { IReceipt } from '@interfaces';
@@ -46,6 +47,14 @@ export const ReceiptList: React.FC<
                 />
               ))}
             </Space>
+          )}
+        />
+        <Table.Column dataIndex="officialName" title="Official Name" />
+        <Table.Column
+          dataIndex="total"
+          title="Total"
+          render={(value: any) => (
+            <InputNumber readOnly value={value} step="0.01" />
           )}
         />
         <Table.Column<IReceipt>

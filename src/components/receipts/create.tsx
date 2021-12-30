@@ -8,41 +8,46 @@ import {
   getValueFromEvent,
   useFileUploadState,
   FormProps,
-  Progress,
-  Typography,
+  Spin,
+  InputNumber,
 } from '@pankod/refine';
 import { IReceipt } from '@interfaces';
 import axios from 'axios';
 import { useState } from 'react';
-import Tesseract from 'tesseract.js';
+import getReceiptText from 'src/utils/getReceiptText';
 
 export const ReceiptCreate: React.FC = () => {
   const { formProps, saveButtonProps } = useForm<IReceipt>({
     redirect: 'show',
   });
+
   const { isLoading, onChange } = useFileUploadState();
   const [isExtracting, setExtracting] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [ocr, setOCR] = useState<any>(null);
+
+  const [image, setImage] = useState('');
 
   const { form }: FormProps = formProps;
 
-  const ocrExtractor = (imageUrl: string) => {
-    Tesseract.recognize(imageUrl, 'por+eng', {
-      logger: (m) => {
-        if (m.status === 'recognizing text') {
-          setProgress(Math.round(m?.progress * 100));
-        }
-      },
-    })
-      .catch((err) => {
-        console.error(err);
+  const textractPost = (inputS3Object: any) => {
+    axios
+      .post('/api/textract', inputS3Object)
+      .then(({ data: result }) => {
+        const transformReceipt = getReceiptText(result.SummaryFields);
+        const { officialName, total } = transformReceipt;
+
+        console.log(transformReceipt);
+
+        form?.setFieldsValue({ officialName, total: Number(total) });
+
+        setOCR(transformReceipt);
       })
-      .then((result: any) => {
-        console.log(result);
-        setOCR(result);
+      .catch((err) => {
+        console.log(err);
       });
   };
+
+  console.log(form?.getFieldsValue());
 
   const uploadProps = {
     customRequest({
@@ -63,8 +68,11 @@ export const ReceiptCreate: React.FC = () => {
           fileType: file.type,
         })
         .then((res) => {
-          const { signedRequest, url }: { signedRequest: string; url: string } =
-            res.data;
+          const {
+            signedRequest,
+            url,
+            textract,
+          }: { signedRequest: string; url: string; textract: any } = res.data;
 
           const options = {
             headers: {
@@ -89,16 +97,15 @@ export const ReceiptCreate: React.FC = () => {
             .then(({ data: result }) => {
               onSuccess(result, file);
 
-              const values = form?.getFieldsValue();
-              form?.setFieldsValue({ ...values, attachments: [{ url }] });
+              form?.setFieldsValue({ attachments: [{ url }] });
 
               const image = URL.createObjectURL(file);
 
+              setImage(image);
               setExtracting(true);
-              setProgress(0);
               setOCR(null);
 
-              ocrExtractor(image);
+              textractPost(textract);
             })
             .catch(onError);
 
@@ -176,11 +183,34 @@ export const ReceiptCreate: React.FC = () => {
           </Upload.Dragger>
         </Form.Item>
         {isExtracting && (
-          <Form.Item label="Items">
-            {!ocr && <Progress type="circle" percent={progress} />}
-            {ocr?.data?.lines?.map((item: any) => (
-              <Typography>{item.text}</Typography>
-            ))}
+          <Form.Item label="Receipt">
+            <img src={image} /> {!ocr && <Spin size="large" />}
+          </Form.Item>
+        )}
+        {ocr && (
+          <Form.Item
+            label="Official Name"
+            name="officialName"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+        )}
+        {ocr && (
+          <Form.Item
+            label="Total"
+            name="total"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <InputNumber prefix="R$" step="0.01" />
           </Form.Item>
         )}
       </Form>

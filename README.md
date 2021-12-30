@@ -17,20 +17,23 @@ The software needs to be trained to obtain information on tax receipts of variou
 # Solution
 
 Infrastructure
+
 - [x] Deploy on the application server at Vercel
 - [x] Integration with Airtable
 - [x] Integration with S3 for uploading images
 
 Application
+
 - [x] Installation of Boilerplate Refine
 - [x] Listing and Exclusion Page
 - [x] Creation page
 - [x] Edit page
 - [x] Details page
-- [] Text extraction by OCR
+- [x] Text extraction by OCR
 - [] Save extracted content in Markdown table format
 
 Others
+
 - [] Authentication
 - [] Expense report build
 - [] E-mail expense report
@@ -41,6 +44,14 @@ Others
 
 - Get your API key in your [account page](https://airtable.com/account), generating a new API key if necessary. Add to NEXT_PUBLIC_AIRTABLE_API_TOKEN variable at your .env file.
 - Get your base ID from your table at Airtable [API page](https://airtable.com/api). Add to NEXT_PUBLIC_AIRTABLE_BASE_ID variable at your .env file.
+
+## AWS S3
+
+## AWS IAM
+
+# References
+
+- [Image Text Conversion](https://www.smashingmagazine.com/2021/06/image-text-conversion-react-tesseract-js-ocr/)
 
 # Authors
 

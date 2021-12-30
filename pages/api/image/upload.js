@@ -27,6 +27,10 @@ export default async function handler(req, res) {
     const returnData = {
       signedRequest: data,
       url: `https://${s3Bucket}.s3.amazonaws.com/${fileName}`,
+      textract: {
+        Bucket: s3Bucket,
+        Name: fileName,
+      },
     };
 
     return res.status(200).json(returnData);

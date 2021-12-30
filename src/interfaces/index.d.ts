@@ -4,6 +4,8 @@ export interface IReceipt {
   notes: string;
   attachments: IImage[];
   status: 'published' | 'draft';
+  officialName: string;
+  total: number;
 }
 
 interface IImage {
