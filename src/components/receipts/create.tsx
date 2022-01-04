@@ -10,6 +10,7 @@ import {
   FormProps,
   Spin,
   InputNumber,
+  useCreate,
 } from '@pankod/refine';
 import { IReceipt } from '@interfaces';
 import axios from 'axios';
@@ -36,8 +37,6 @@ export const ReceiptCreate: React.FC = () => {
         const transformReceipt = getReceiptText(result.SummaryFields);
         const { officialName, total } = transformReceipt;
 
-        console.log(transformReceipt);
-
         form?.setFieldsValue({ officialName, total: Number(total) });
 
         setOCR(transformReceipt);
@@ -46,8 +45,6 @@ export const ReceiptCreate: React.FC = () => {
         console.log(err);
       });
   };
-
-  console.log(form?.getFieldsValue());
 
   const uploadProps = {
     customRequest({
@@ -210,7 +207,7 @@ export const ReceiptCreate: React.FC = () => {
               },
             ]}
           >
-            <InputNumber prefix="R$" step="0.01" />
+            <InputNumber step="0.01" />
           </Form.Item>
         )}
       </Form>

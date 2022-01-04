@@ -8,6 +8,7 @@ import {
   useFileUploadState,
   Upload,
   FormProps,
+  InputNumber,
 } from '@pankod/refine';
 import { IReceipt } from '@interfaces';
 import axios from 'axios';
@@ -18,7 +19,6 @@ export const ReceiptEdit: React.FC = () => {
   const { isLoading, onChange } = useFileUploadState();
 
   const { form }: FormProps = formProps;
-
 
   const uploadProps = {
     customRequest({
@@ -140,11 +140,34 @@ export const ReceiptEdit: React.FC = () => {
             accept=".png"
             onChange={onChange}
             {...uploadProps}
+            disabled
           >
             <p className="ant-upload-text">
               Drag & drop a receipt in this area
             </p>
           </Upload.Dragger>
+        </Form.Item>
+        <Form.Item
+          label="Official Name"
+          name="officialName"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="Total"
+          name="total"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <InputNumber step="0.01" />
         </Form.Item>
       </Form>
     </Edit>

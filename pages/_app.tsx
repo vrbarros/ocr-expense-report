@@ -5,7 +5,7 @@ import { Refine } from '@pankod/refine';
 import routerProvider from '@pankod/refine-nextjs-router';
 
 import '@pankod/refine/dist/styles.min.css';
-import dataProvider from '@pankod/refine-airtable';
+import dataProvider from 'src/middleware/dataProvider';
 
 import {
   ReceiptList,
