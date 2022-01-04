@@ -170,7 +170,7 @@ export const ReceiptCreate: React.FC = () => {
             name="file"
             listType="picture"
             maxCount={1}
-            accept=".png"
+            accept=".png,.jpeg"
             onChange={onChange}
             {...uploadProps}
           >
