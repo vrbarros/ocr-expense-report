@@ -11,72 +11,15 @@ import {
   InputNumber,
 } from '@pankod/refine';
 import { IReceipt } from '@interfaces';
-import axios from 'axios';
 
 export const ReceiptEdit: React.FC = () => {
+  const { TextArea } = Input;
+
   const { formProps, saveButtonProps } = useForm<IReceipt>();
 
   const { isLoading, onChange } = useFileUploadState();
 
   const { form }: FormProps = formProps;
-
-  const uploadProps = {
-    customRequest({
-      file,
-      onError,
-      onProgress,
-      onSuccess,
-    }: {
-      file: any;
-      onError?: any;
-      onProgress?: any;
-      onSuccess?: any;
-    }): void {
-      axios
-        .post('/api/image/upload', {
-          fileUid: file.uid,
-          fileName: file.name,
-          fileType: file.type,
-        })
-        .then((res) => {
-          const { signedRequest, url } = res.data;
-
-          const options = {
-            headers: {
-              'Content-Type': file.type,
-            },
-            onUploadProgress: ({
-              total,
-              loaded,
-            }: {
-              total: any;
-              loaded: any;
-            }) => {
-              onProgress(
-                { percent: Math.round((loaded / total) * 100).toFixed(2) },
-                file
-              );
-            },
-          };
-
-          axios
-            .put(signedRequest, file, options)
-            .then(({ data: result }) => {
-              onSuccess(result, file);
-
-              const values = form?.getFieldsValue();
-              form?.setFieldsValue({ ...values, attachments: [{ url }] });
-            })
-            .catch(onError);
-
-          return {
-            abort() {
-              console.log('Upload progress is aborted!');
-            },
-          };
-        });
-    },
-  };
 
   return (
     <Edit
@@ -120,7 +63,7 @@ export const ReceiptEdit: React.FC = () => {
           />
         </Form.Item>
         <Form.Item label="Notes" name="notes">
-          <Input />
+          <TextArea showCount maxLength={1000} />
         </Form.Item>
         <Form.Item
           label="Attachments"
@@ -139,7 +82,6 @@ export const ReceiptEdit: React.FC = () => {
             maxCount={1}
             accept=".png"
             onChange={onChange}
-            {...uploadProps}
             disabled
           >
             <p className="ant-upload-text">

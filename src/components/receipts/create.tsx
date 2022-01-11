@@ -18,6 +18,8 @@ import { useState } from 'react';
 import getReceiptText from 'src/utils/getReceiptText';
 
 export const ReceiptCreate: React.FC = () => {
+  const { TextArea } = Input;
+
   const { formProps, saveButtonProps } = useForm<IReceipt>({
     redirect: 'show',
   });
@@ -34,10 +36,14 @@ export const ReceiptCreate: React.FC = () => {
     axios
       .post('/api/textract', inputS3Object)
       .then(({ data: result }) => {
-        const transformReceipt = getReceiptText(result.SummaryFields);
-        const { officialName, total } = transformReceipt;
+        const transformReceipt = getReceiptText(result);
+        const { officialName, total, items } = transformReceipt;
 
-        form?.setFieldsValue({ officialName, total: Number(total) });
+        form?.setFieldsValue({
+          officialName,
+          total: Number(total),
+          notes: items,
+        });
 
         setOCR(transformReceipt);
       })
@@ -135,7 +141,7 @@ export const ReceiptCreate: React.FC = () => {
           <Input />
         </Form.Item>
         <Form.Item label="Notes" name="notes">
-          <Input />
+          <TextArea showCount maxLength={1000} />
         </Form.Item>
         <Form.Item
           label="Status"
