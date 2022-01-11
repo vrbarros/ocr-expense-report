@@ -187,7 +187,8 @@ export const ReceiptCreate: React.FC = () => {
         </Form.Item>
         {isExtracting && (
           <Form.Item label="Receipt">
-            <img src={image} /> {!ocr && <Spin size="large" />}
+            <img src={image} style={{ maxWidth: 400 }} />{' '}
+            {!ocr && <Spin size="large" />}
           </Form.Item>
         )}
         {ocr && (
